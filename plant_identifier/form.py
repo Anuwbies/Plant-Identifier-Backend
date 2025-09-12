@@ -1,7 +1,10 @@
 from django import forms
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
+
+# ---------------- SIGN UP FORM ----------------
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput,
@@ -46,3 +49,33 @@ class UserRegistrationForm(forms.ModelForm):
         if password and confirm_password and password != confirm_password:
             raise ValidationError("Passwords do not match")
         return confirm_password
+
+
+# ---------------- SIGN IN FORM ----------------
+class UserSignInForm(forms.Form):
+    username = forms.CharField(max_length=150, label='Username')
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        password = cleaned_data.get('password')
+
+        if username and password:
+            # Try username
+            user = authenticate(username=username, password=password)
+
+            # Try email if username fails
+            if user is None:
+                try:
+                    user_by_email = User.objects.get(email=username)
+                    user = authenticate(username=user_by_email.username, password=password)
+                except User.DoesNotExist:
+                    pass
+
+            if user is None:
+                raise forms.ValidationError("Invalid username/email or password.")
+            else:
+                self.user = user  # Save for views.py
+
+        return cleaned_data

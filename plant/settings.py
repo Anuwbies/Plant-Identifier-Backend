@@ -13,8 +13,15 @@ SECRET_KEY = 'django-insecure-qcow&9(oxjjf#hj47%fo9gb%+ch-v!!@o%(#wp*yb=q4pomupz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.100.4','localhost','127.0.0.1']
+ALLOWED_HOSTS = ['192.168.1.209','localhost','127.0.0.1']
 
+
+#
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 # Application definition
 
@@ -25,7 +32,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'plant_identifier'
+    'plant_identifier',
+    'rest_framework',
+    'corsheaders',
+    
 ]
 
 MIDDLEWARE = [
