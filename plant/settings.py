@@ -14,8 +14,7 @@ SECRET_KEY = 'django-insecure-qcow&9(oxjjf#hj47%fo9gb%+ch-v!!@o%(#wp*yb=q4pomupz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.100.4','localhost','127.0.0.1']
-
+ALLOWED_HOSTS = ['192.168.100.4','localhost','127.0.0.1','192.168.100.12','172.20.10.2','10.0.2.2']
 
 # Application definition
 
@@ -26,7 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'plant_identifier'
+    'plant_identifier',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
