@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 
 class UserRegistrationForm(forms.ModelForm):
@@ -46,3 +47,30 @@ class UserRegistrationForm(forms.ModelForm):
         if password and confirm_password and password != confirm_password:
             raise ValidationError("Passwords do not match")
         return confirm_password
+    
+#===================================================================================================================================================================================
+
+class UserLoginForm(forms.Form):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'placeholder': 'Email'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        password = cleaned_data.get('password')
+
+        if email and password:
+            try:
+                # Find the user with this email
+                user_obj = User.objects.get(email=email)
+                username = user_obj.username
+                user = authenticate(username=username, password=password)
+                if user is None:
+                    raise ValidationError("Invalid email or password")
+            except User.DoesNotExist:
+                raise ValidationError("Invalid email or password")
+        return cleaned_data
