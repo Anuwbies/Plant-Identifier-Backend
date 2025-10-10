@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from plant_identifier.views.auth_views import registerUser, loginUser
 from plant_identifier.views.prediction_views import predict
 from plant_identifier.views.random_views import random_plants
+from plant_identifier.views.saved_plant_views import SavedPlantListCreateView, SavedPlantDetailView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,6 +14,10 @@ urlpatterns = [
     path('login/', loginUser, name='login'),
     path('predict/', predict, name='predict'),
     path('random-plants/', random_plants, name='random_plants'),
+
+    # ✅ SavedPlant endpoints
+    path('saved-plants/', SavedPlantListCreateView.as_view(), name='saved-plant-list-create'),
+    path('saved-plants/<int:id>/', SavedPlantDetailView.as_view(), name='saved-plant-detail'),
 ]
 
 if settings.DEBUG:

@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import os
 
-# Config
 use_gpu = False
 device = torch.device('cuda' if use_gpu else 'cpu')
 
@@ -51,27 +50,32 @@ def predict(request):
                 confidence = top_prob.item()
                 predicted_idx = predicted_idx.item()
 
+            # Get species ID
             species_id = class_idx_to_species_id.get(str(predicted_idx), None)
             species_id_str = str(species_id).strip() if species_id else None
 
             common_name = species_id_to_cmn_name.get(species_id_str, "Unknown")
             scientific_name = species_id_to_scn_name.get(species_id_str, "Unknown")
 
+            # Get one sample image if available
             sample_image_url = None
             if species_id_str:
                 species_folder = os.path.join("media", "images", species_id_str)
                 if os.path.isdir(species_folder):
-                    files = [f for f in os.listdir(species_folder) if os.path.isfile(os.path.join(species_folder, f))]
+                    files = [
+                        f for f in os.listdir(species_folder)
+                        if os.path.isfile(os.path.join(species_folder, f))
+                    ]
                     if files:
                         sample_image_url = f"/media/images/{species_id_str}/{files[0]}"
 
             return JsonResponse({
-                "predicted_index": predicted_idx,
-                "species_id": species_id_str or "Unknown",
+                "predicted_index": int(predicted_idx),
+                "species_id": int(species_id) if species_id else 0,
                 "common_name": common_name,
                 "scientific_name": scientific_name,
-                "confidence": confidence,
-                "sample_image": sample_image_url or "Not available"
+                "confidence": float(confidence),
+                "sample_image": sample_image_url or "Not available",
             })
 
         except Exception as e:

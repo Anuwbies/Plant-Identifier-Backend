@@ -33,7 +33,7 @@ def loginUser(request):
             return Response({
                 'success': True,
                 'user': {
-                    'id': user.id,
+                    'userId': user.id,
                     'username': user.username,
                     'email': user.email,
                     'joined_date': user.date_joined.strftime('%b %d, %Y')
