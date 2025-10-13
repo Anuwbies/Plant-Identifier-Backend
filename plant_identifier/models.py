@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class SavedPlant(models.Model):
     user = models.ForeignKey(
         User,
@@ -24,9 +25,12 @@ class SavedPlant(models.Model):
         ]
 
     def __str__(self):
-        username = self.user.username if self.user else "No User"
-        return f"{self.common_name} ({username})"
-
+        if self.user:
+            full_name = f"{self.user.first_name} {self.user.last_name}".strip()
+            name_display = full_name if full_name else self.user.username
+        else:
+            name_display = "No User"
+        return f"{self.common_name} ({name_display})"
 
 
 class PlantHistory(models.Model):
@@ -51,5 +55,9 @@ class PlantHistory(models.Model):
         ordering = ['-identified_at']
 
     def __str__(self):
-        username = self.user.username if self.user else "No User"
-        return f"{self.common_name} ({username}) - {self.identified_at.strftime('%Y-%m-%d %H:%M')}"
+        if self.user:
+            full_name = f"{self.user.first_name} {self.user.last_name}".strip()
+            name_display = full_name if full_name else self.user.username
+        else:
+            name_display = "No User"
+        return f"{self.common_name} ({name_display}) - {self.identified_at.strftime('%Y-%m-%d %H:%M')}"

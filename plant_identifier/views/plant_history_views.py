@@ -40,7 +40,6 @@ class PlantHistoryListCreateView(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ✅ Add this new class for DELETE
 class PlantHistoryDetailView(generics.GenericAPIView):
     def delete(self, request, id):
         user_id = request.query_params.get('user_id')
