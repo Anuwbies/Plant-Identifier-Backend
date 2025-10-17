@@ -19,27 +19,37 @@ def registerUser(request):
 
 #===================================================================================================================================================================================
 
+
 @api_view(['POST'])
 def loginUser(request):
     form = UserLoginForm(request.data)
     if form.is_valid():
         email = form.cleaned_data['email']
-        user_obj = User.objects.get(email=email)
-        username = user_obj.username
-        user = authenticate(username=username, password=form.cleaned_data['password'])
+        password = form.cleaned_data['password']
+
+        try:
+            # Find user by email
+            user_obj = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Authenticate using username (Django requires this internally)
+        user = authenticate(username=user_obj.username, password=password)
 
         if user is not None:
-            login(request, user)  
+            login(request, user)
             return Response({
                 'success': True,
                 'user': {
                     'userId': user.id,
-                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
                     'email': user.email,
-                    'joined_date': user.date_joined.strftime('%b %d, %Y')
+                    'joined_date': user.date_joined.strftime('%b %d, %Y'),
                 }
             }, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+

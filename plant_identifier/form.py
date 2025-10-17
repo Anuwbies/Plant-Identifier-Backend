@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 
+
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput,
@@ -17,17 +18,20 @@ class UserRegistrationForm(forms.ModelForm):
         error_messages={'invalid': 'Enter a valid email address'}
     )
 
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        error_messages={'required': 'First name is required'}
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        required=True,
+        error_messages={'required': 'Last name is required'}
+    )
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
-
-    def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if User.objects.filter(username=username).exists():
-            raise ValidationError("Username already exists")
-        if not 3 <= len(username) <= 16:
-            raise ValidationError("Username must be 3-16 characters")
-        return username
+        fields = ['first_name', 'last_name', 'email', 'password']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -47,8 +51,17 @@ class UserRegistrationForm(forms.ModelForm):
         if password and confirm_password and password != confirm_password:
             raise ValidationError("Passwords do not match")
         return confirm_password
-    
-#===================================================================================================================================================================================
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = self.cleaned_data['email']  # use email as username
+        user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+        return user
+
+
+# ===================================================================================================================================================================================
 
 class UserLoginForm(forms.Form):
     email = forms.EmailField(
@@ -65,7 +78,7 @@ class UserLoginForm(forms.Form):
 
         if email and password:
             try:
-                # Find the user with this email
+                # Find the user by email and authenticate using username (email)
                 user_obj = User.objects.get(email=email)
                 username = user_obj.username
                 user = authenticate(username=username, password=password)

@@ -8,7 +8,7 @@ from .models import SavedPlant, PlantHistory
 class SavedPlantAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'user',
+        'get_user_full_name',
         'common_name',
         'scientific_name',
         'species_id',
@@ -20,16 +20,25 @@ class SavedPlantAdmin(admin.ModelAdmin):
         'common_name',
         'scientific_name',
         'species_id',
-        'user__username',
+        'user__first_name',
+        'user__last_name',
+        'user__email',
     )
     list_filter = ('created_at', 'updated_at')
+
+    def get_user_full_name(self, obj):
+        if obj.user:
+            full_name = f"{obj.user.first_name} {obj.user.last_name}".strip()
+            return full_name if full_name else obj.user.email
+        return "No User"
+    get_user_full_name.short_description = "User"
 
 
 @admin.register(PlantHistory)
 class PlantHistoryAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'user',
+        'get_user_full_name',
         'common_name',
         'scientific_name',
         'species_id',
@@ -40,13 +49,23 @@ class PlantHistoryAdmin(admin.ModelAdmin):
         'common_name',
         'scientific_name',
         'species_id',
-        'user__username',
+        'user__first_name',
+        'user__last_name',
+        'user__email',
     )
     list_filter = ('identified_at',)
 
+    def get_user_full_name(self, obj):
+        if obj.user:
+            full_name = f"{obj.user.first_name} {obj.user.last_name}".strip()
+            return full_name if full_name else obj.user.email
+        return "No User"
+    get_user_full_name.short_description = "User"
+
 
 class CustomUserAdmin(DefaultUserAdmin):
-    list_display = ('id', 'username', 'email', 'is_staff')
+    list_display = ('id', 'first_name', 'last_name', 'email', 'is_staff')
+    search_fields = ('first_name', 'last_name', 'email')
 
 
 admin.site.unregister(User)
