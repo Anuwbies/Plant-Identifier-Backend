@@ -47,6 +47,7 @@ class PlantHistory(models.Model):
     confidence = models.FloatField(null=True, blank=True)
     image_url = models.URLField(blank=True, null=True)
     identified_at = models.DateTimeField(auto_now_add=True)
+    is_correct = models.BooleanField(null=True, blank=True)
 
     class Meta:
         constraints = [
