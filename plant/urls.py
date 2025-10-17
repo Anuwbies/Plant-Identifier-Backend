@@ -12,16 +12,13 @@ from . import views
 from plant_identifier.views.auth_views import registerUser, loginUser
 from plant_identifier.views.prediction_views import predict, explain_llm
 from plant_identifier.views.random_views import random_plants
-from plant_identifier.views.saved_plant_views import SavedPlantListCreateView, SavedPlantDetailView
+from plant_identifier.views.saved_plant_views import SavedPlantListCreateView, SavedPlantDetailView, AdminSavedPlantsView
 from plant_identifier.views.plant_history_views import PlantHistoryListCreateView, PlantHistoryDetailView
-<<<<<<< HEAD
 from plant_identifier.views.reports_view import generate_report
-=======
 from plant_identifier.views.admin_views import AllPlantIdentificationsView, AnalyticsPlantView
 
 # Import the dashboard stats view directly
 from authentication.views import DashboardStatsView
->>>>>>> 21f4496113b2d8c585353a6bc54f7b67f4f2fac0
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,14 +32,16 @@ urlpatterns = [
     # ✅ SavedPlant endpoints
     path('saved-plants/', SavedPlantListCreateView.as_view(), name='saved-plant-list-create'),
     path('saved-plants/<int:id>/', SavedPlantDetailView.as_view(), name='saved-plant-detail'),
+    
+    # Admin saved plants endpoint
+    path('api/plants/admin/saved-plants/', AdminSavedPlantsView.as_view(), name='admin-saved-plants'),
 
     path('plant-history/', PlantHistoryListCreateView.as_view(), name='plant-history'),
     path('plant-history/<int:id>/', PlantHistoryDetailView.as_view(), name='plant-history-detail'),
-<<<<<<< HEAD
 
     # Report module
-    path('reports/', generate_report),
-=======
+    path('api/plants/reports/', generate_report, name='generate_report'),
+    path('reports/', generate_report),  # Keep existing endpoint
     path('api/plants/analytics/', AnalyticsPlantView.as_view(), name='analytics-plant'),
     
 
@@ -64,11 +63,12 @@ urlpatterns = [
     path('summary/', views.get_summary, name='summary'),
     
     # Plant CRUD endpoints
-    path('', views.plant_list_create, name='plant-list-create'),
+    path('plants/', views.plant_list_create, name='plant-list-create'),
     path('api/plants/<str:plant_id>/', views.plant_detail, name='plant-detail'),
     path('api/plants/tags/available/', views.get_available_tags, name='available-tags'),
->>>>>>> 21f4496113b2d8c585353a6bc54f7b67f4f2fac0
 ]
 
+# Serve static and media files in DEBUG mode
 if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

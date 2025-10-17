@@ -427,12 +427,45 @@ class DashboardStatsView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
+        # Debug logging
+        print(f"[DashboardStats] Authorization header: {request.META.get('HTTP_AUTHORIZATION', 'NOT FOUND')[:50]}")
+        print(f"[DashboardStats] User authenticated: {request.user.is_authenticated}")
+        print(f"[DashboardStats] User: {request.user}")
+        print(f"[DashboardStats] User ID: {request.user.id if request.user.is_authenticated else 'N/A'}")
+        
+        # Check if user is authenticated
+        if not request.user.is_authenticated:
+            return Response({
+                'success': False,
+                'error': 'Authentication required',
+                'code': 'authentication_required'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Check if user exists
+        if request.user.is_anonymous:
+            return Response({
+                'success': False,
+                'error': 'User not found',
+                'code': 'user_not_found'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
         from django.contrib.auth.models import User
         from plant_identifier.models import PlantHistory, SavedPlant
-        from django.db.models import Count, Q
+        from django.db.models import Count
         from datetime import datetime, timedelta
         
         try:
+            # Verify user exists in database
+            try:
+                user = User.objects.get(id=request.user.id)
+                print(f"[DashboardStats] User found: {user.username} (ID: {user.id})")
+            except User.DoesNotExist:
+                return Response({
+                    'success': False,
+                    'error': 'User account not found in database',
+                    'code': 'user_not_found'
+                }, status=status.HTTP_401_UNAUTHORIZED)
+            
             # Get basic stats
             total_users = User.objects.count()
             total_identifications = PlantHistory.objects.count()
@@ -461,7 +494,7 @@ class DashboardStatsView(APIView):
                     'count': plant['count']
                 })
             
-            return Response({
+            response_data = {
                 'success': True,
                 'stats': {
                     'total_users': total_users,
@@ -470,12 +503,19 @@ class DashboardStatsView(APIView):
                     'recent_identifications': recent_identifications,
                     'popular_plants': popular_plants_formatted,
                 }
-            }, status=status.HTTP_200_OK)
+            }
+            
+            print(f"[DashboardStats] Returning stats: {response_data}")
+            return Response(response_data, status=status.HTTP_200_OK)
             
         except Exception as e:
+            print(f"[DashboardStats] Error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return Response({
                 'success': False,
-                'error': str(e)
+                'error': str(e),
+                'code': 'internal_error'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
