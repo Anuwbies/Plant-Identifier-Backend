@@ -11,6 +11,7 @@ from plant_identifier.views.prediction_views import predict, explain_llm
 from plant_identifier.views.random_views import random_plants
 from plant_identifier.views.saved_plant_views import SavedPlantListCreateView, SavedPlantDetailView
 from plant_identifier.views.plant_history_views import PlantHistoryListCreateView, PlantHistoryDetailView
+from plant_identifier.views.admin_views import AllPlantIdentificationsView, AnalyticsPlantView
 
 # Import the dashboard stats view directly
 from authentication.views import DashboardStatsView
@@ -22,6 +23,7 @@ urlpatterns = [
     path('predict/', predict, name='predict'),
     path('explain-llm/', explain_llm, name='explain_llm'),
     path('random-plants/', random_plants, name='random_plants'),
+    path('api/plants/admin/identifications/', AllPlantIdentificationsView.as_view(), name='admin_identifications'),
 
     # ✅ SavedPlant endpoints
     path('saved-plants/', SavedPlantListCreateView.as_view(), name='saved-plant-list-create'),
@@ -29,6 +31,9 @@ urlpatterns = [
 
     path('plant-history/', PlantHistoryListCreateView.as_view(), name='plant-history'),
     path('plant-history/<int:id>/', PlantHistoryDetailView.as_view(), name='plant-history-detail'),
+    path('api/plants/analytics/', AnalyticsPlantView.as_view(), name='analytics-plant'),
+    
+
     
     # Admin web dashboard endpoints
     path('api/auth/', include('authentication.urls')),
