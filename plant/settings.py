@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',        # Only once!
     'plant_identifier',   # Only once!
     'authentication',     # Admin authentication
+    'plant'
 ]
 
 # CORS must be first in middleware
@@ -217,3 +218,15 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Plant Identifier <jos
 # Password Reset Settings
 PASSWORD_RESET_TIMEOUT = 3600  # 1 hour in seconds
 OTP_EXPIRY_TIME = 600  # 10 minutes in seconds
+
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = 'static/'
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
